@@ -7,17 +7,24 @@
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "exports": {
-    "types": "./dist/index.d.ts",
-    "import": "./dist/index.mjs",
-    "module": "./dist/index.esm.js",
-    "require": "./dist/index.cjs"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "module": "./dist/index.esm.js",
+      "require": "./dist/index.cjs"
+    },
+    "./memoize": {
+      "import": "./dist/memoize.mjs",
+      "module": "./dist/memoize.esm.js",
+      "require": "./dist/memoize.cjs"
+    }
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "dev": "pnpm run build --watch",
-    "build": "bunchee ./src/index.ts --target es2018",
+    "build": "bunchee --target es2018",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",

@@ -5,6 +5,7 @@ import { TW_VARS } from "./constants";
 
 export interface ClassedCoreConfig {
   merger?: (...args: string[]) => any;
+  memoizer?: (fn: ClassedProducer) => ReturnType<ClassedProducer>;
 }
 export interface CreateClassedCoreType {
   (config?: ClassedCoreConfig): {
@@ -14,13 +15,15 @@ export interface CreateClassedCoreType {
 
 const internalClassed = <V extends Variants = {}>(
   classes: Array<any>,
-  { merger = cn }: ClassedCoreConfig = {}
+  { merger = cn, memoizer }: ClassedCoreConfig = {}
 ) => {
   // Parse classNames and variants
   const { className, variants, defaultVariants, compoundVariants } =
     parseClassNames(classes);
 
-  const producer = ((variantProps: any) => {
+  const mainProducer = ((variantProps: any) => {
+    // Memoize the classed producer if memoizer is defined
+
     // Map variant props to className
     const variantClassName = mapPropsToVariantClass(
       { variants, defaultVariants, compoundVariants },
@@ -33,6 +36,10 @@ const internalClassed = <V extends Variants = {}>(
 
     return merger(className, variantClassName, ...extra);
   }) as ClassedProducer<V>;
+
+  const producer: ClassedProducer<V> = memoizer
+    ? memoizer(mainProducer as any)
+    : mainProducer;
 
   // Add variants to the classed producer
   Reflect.set(producer, TW_VARS, {
